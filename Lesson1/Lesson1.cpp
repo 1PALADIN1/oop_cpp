@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <cstdint>
 
 namespace lesson1
 {
@@ -33,22 +34,65 @@ namespace lesson1
         }
     };
 
+    /*
+     * 2. Написать класс с именем RGBA, который содержит 4 переменные-члена
+     * типа std::uint8_t: m_red, m_green, m_blue и m_alpha (#include cstdint для доступа к этому типу).
+     * Задать 0 в качестве значения по умолчанию для m_red, m_green, m_blue и 255 для m_alpha.
+     * Создать конструктор со списком инициализации членов, который позволит пользователю передавать значения
+     * для m_red, m_blue, m_green и m_alpha.
+     * Написать функцию print(), которая будет выводить значения переменных-членов.
+     */
+
+    class RGBA {
+    private:
+        std::uint8_t m_red;
+        std::uint8_t m_green;
+        std::uint8_t m_blue;
+        std::uint8_t m_alpha;
+
+    public:
+        RGBA() {
+            m_red = 0;
+            m_green = 0;
+            m_blue = 0;
+            m_alpha = 255;
+        }
+
+        RGBA(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a)
+        : m_red(r), m_green(g), m_blue(b), m_alpha(a) {
+        }
+
+        void print() {
+            std::cout << "R:" << (int)m_red << ", G:" << (int)m_green
+            << ", B:" << (int)m_blue << ", A:" << (int)m_alpha << std::endl;
+        }
+    };
 
     // ================ Тестирование ================
 
     void powerTest() {
-        Power power;
-        power.calculate();
-        power.set(2, 6);
-        power.calculate();
-        power.set(11, 4);
-        power.calculate();
+        Power pwr;
+        pwr.calculate();
+        pwr.set(2, 6);
+        pwr.calculate();
+        pwr.set(11, 4);
+        pwr.calculate();
+    }
+
+    void rgbaTest() {
+        RGBA rgba;
+        rgba.print();
+
+        RGBA rgba1(23, 123, 2, 180);
+        rgba1.print();
     }
 
     void run() {
         std::cout << "====================== LESSON 1 ======================" << std::endl;
         std::cout << "Task1:" << std::endl;
-
         powerTest();
+
+        std::cout << "Task2:" << std::endl;
+        rgbaTest();
     }
 }
