@@ -2,8 +2,7 @@
 #include <cmath>
 #include <cstdint>
 
-namespace lesson1
-{
+namespace lesson1 {
     /*
      * 1. Создать класс Power, который содержит два вещественных числа. Этот класс должен иметь две
      * переменные-члена для хранения этих вещественных чисел. Еще создать два метода: один с именем set,
@@ -68,6 +67,73 @@ namespace lesson1
         }
     };
 
+    /*
+     * 3. Написать класс, который реализует функциональность стека. Класс Stack должен иметь:
+     * • private-массив целых чисел длиной 10;
+     * • private целочисленное значение для отслеживания длины стека;
+     * • public-метод с именем reset(), который будет сбрасывать длину и все значения элементов на 0;
+     * • public-метод с именем push(), который будет добавлять значение в стек. push() должен возвращать значение false, если массив уже заполнен, и true в противном случае;
+     * • public-метод с именем pop() для вытягивания и возврата значения из стека. Если в стеке нет значений, то должно выводиться предупреждение;
+     * • public-метод с именем print(), который будет выводить все значения стека.
+     */
+
+    class Stack {
+    private:
+        const size_t ARRAY_SIZE = 10;
+        int* array;
+        int pointer_index;
+
+    public:
+        Stack() {
+            reset();
+        }
+
+        ~Stack() {
+            delete[] array;
+        }
+
+        bool push(int value) {
+
+            if (pointer_index + 1 >= ARRAY_SIZE)
+                return false;
+
+            array[pointer_index] = value;
+            pointer_index++;
+
+            return true;
+        }
+
+        int pop() {
+            if (pointer_index == 0) {
+                std::cout << "Error! Stack is empty." << std::endl;
+                return -1;
+            }
+
+            int value = array[pointer_index];
+            pointer_index--;
+            array[pointer_index] = 0;
+            return value;
+        }
+
+        void reset() {
+            pointer_index = 0;
+            array = new int[ARRAY_SIZE];
+            for (int i = 0; i < ARRAY_SIZE; ++i) {
+                array[i] = 0;
+            }
+        }
+
+        void print() {
+            std::cout << "( ";
+            for (int i = 0; i < ARRAY_SIZE; ++i) {
+                if (array[i] != 0)
+                    std::cout << array[i] << " ";
+            }
+
+            std::cout << ")" << std::endl;
+        }
+    };
+
     // ================ Тестирование ================
 
     void powerTest() {
@@ -87,6 +153,24 @@ namespace lesson1
         rgba1.print();
     }
 
+    void stackTest() {
+        Stack stack;
+        stack.reset();
+        stack.print();
+
+        stack.push(3);
+        stack.push(7);
+        stack.push(5);
+        stack.print();
+
+        stack.pop();
+        stack.print();
+
+        stack.pop();
+        stack.pop();
+        stack.print();
+    }
+
     void run() {
         std::cout << "====================== LESSON 1 ======================" << std::endl;
         std::cout << "Task1:" << std::endl;
@@ -94,5 +178,8 @@ namespace lesson1
 
         std::cout << "Task2:" << std::endl;
         rgbaTest();
+
+        std::cout << "Task3:" << std::endl;
+        stackTest();
     }
 }
