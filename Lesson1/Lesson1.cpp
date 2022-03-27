@@ -85,6 +85,7 @@ namespace lesson1 {
 
     public:
         Stack() {
+            array = new int[ARRAY_SIZE];
             reset();
         }
 
@@ -117,7 +118,6 @@ namespace lesson1 {
 
         void reset() {
             pointer_index = 0;
-            array = new int[ARRAY_SIZE];
             for (int i = 0; i < ARRAY_SIZE; ++i) {
                 array[i] = 0;
             }
