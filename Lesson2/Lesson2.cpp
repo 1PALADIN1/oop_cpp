@@ -13,7 +13,6 @@ namespace lesson2
      */
 
     enum Sex { F, M };
-    int studentsCounter = 0;
 
     class Person {
     protected:
@@ -45,6 +44,8 @@ namespace lesson2
         int studentNumber;
 
     public:
+        static int studentsCounter;
+
         Student(std::string name, int age, float weight, Sex sex, int studyYear)
         : Person(name, age, weight, sex) {
             this->studyYear = studyYear;
@@ -66,6 +67,8 @@ namespace lesson2
         }
     };
 
+    int Student::studentsCounter = 0;
+
     /*
      * 2. Создать классы Apple (яблоко) и Banana (банан), которые наследуют класс Fruit (фрукт).
      * У Fruit есть две переменные-члена: name (имя) и color (цвет).
@@ -86,11 +89,11 @@ namespace lesson2
         : name(name), color(color) {
         }
 
-        std::string getColor() {
+        std::string const getColor() {
             return color;
         }
 
-        std::string getName() {
+        std::string const getName() {
             return name;
         }
     };
@@ -164,7 +167,7 @@ namespace lesson2
 
         thirdStudent.printInfo();
 
-        std::cout << "Total students: " << studentsCounter << std::endl;
+        std::cout << "Total students: " << Student::studentsCounter << std::endl;
     }
 
     void fruitTest() {
