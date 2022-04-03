@@ -66,6 +66,65 @@ namespace lesson3 {
         }
     };
 
+    /*
+     * 2. Создать класс Car (автомобиль) с полями company (компания) и model (модель).
+     * Классы-наследники: PassengerCar (легковой автомобиль) и Bus (автобус).
+     * От этих классов наследует класс Minivan (минивэн). Создать конструкторы для каждого из классов,
+     * чтобы они выводили данные о классах. Создать объекты для каждого из классов и посмотреть,
+     * в какой последовательности выполняются конструкторы. Обратить внимание на проблему «алмаз смерти».
+     *
+     * Примечание: если использовать виртуальный базовый класс, то объект самого "верхнего"
+     * базового класса создает самый "дочерний" класс.
+     */
+
+    class Car {
+    private:
+        std::string company;
+        std::string model;
+
+    public:
+        Car(std::string company, std::string model)
+        : company(company), model(model) {
+        }
+
+        virtual const std::string getInfo() {
+            return "Company: " + company + ", model: " + model;
+        }
+    };
+
+    class PassengerCar : virtual public Car {
+    public:
+        PassengerCar(std::string company, std::string model)
+        : Car(company, model) {
+        }
+
+        const std::string getInfo() override {
+            return "[PassengerCar]: " + Car::getInfo();
+        }
+    };
+
+    class Bus : virtual public Car {
+    public:
+        Bus(std::string company, std::string model)
+        : Car(company, model) {
+        }
+
+        const std::string getInfo() override {
+            return "[Bus]: " + Car::getInfo();
+        }
+    };
+
+    class Minivan : public Bus, public PassengerCar {
+    public:
+        Minivan(std::string company, std::string model)
+        : Car(company, model), Bus(company, model), PassengerCar(model, company) {
+        }
+
+        const std::string getInfo() override {
+            return "[Minivan]: " + Car::getInfo();
+        }
+    };
+
     // ================ Тестирование ================
 
     void figureTest() {
@@ -82,9 +141,22 @@ namespace lesson3 {
         std::cout << "Rhombus area = " << rhombus.area() << std::endl;
     }
 
+    void carTest() {
+        PassengerCar passengerCar("Tesla", "Model S");
+        Bus bus("Volvo", "9900");
+        Minivan minivan("KIA", "Carnival");
+
+        std::cout << passengerCar.getInfo() << std::endl;
+        std::cout << bus.getInfo() << std::endl;
+        std::cout << minivan.getInfo() << std::endl;
+    }
+
     void run() {
         std::cout << "====================== LESSON 3 ======================" << std::endl;
         std::cout << "Task 1:" << std::endl;
         figureTest();
+
+        std::cout << "Task 2:" << std::endl;
+        carTest();
     }
 }
