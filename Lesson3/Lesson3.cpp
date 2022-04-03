@@ -85,10 +85,23 @@ namespace lesson3 {
     public:
         Car(std::string company, std::string model)
         : company(company), model(model) {
+            std::cout << ">>> Car(" << company << ", " << model << ")" << std::endl;
+        }
+
+        const std::string getCompany() {
+            return company;
+        }
+
+        const std::string getModel() {
+            return model;
         }
 
         virtual const std::string getInfo() {
             return "Company: " + company + ", model: " + model;
+        }
+
+        ~Car() {
+            std::cout << ">>> ~Car(" << company << ", " << model << ")" << std::endl;
         }
     };
 
@@ -96,10 +109,15 @@ namespace lesson3 {
     public:
         PassengerCar(std::string company, std::string model)
         : Car(company, model) {
+            std::cout << ">>> PassengerCar(" << company << ", " << model << ")" << std::endl;
         }
 
         const std::string getInfo() override {
             return "[PassengerCar]: " + Car::getInfo();
+        }
+
+        ~PassengerCar() {
+            std::cout << ">>> ~PassengerCar(" << getCompany() << ", " << getModel() << ")" << std::endl;
         }
     };
 
@@ -107,10 +125,15 @@ namespace lesson3 {
     public:
         Bus(std::string company, std::string model)
         : Car(company, model) {
+            std::cout << ">>> Bus(" << company << ", " << model << ")" << std::endl;
         }
 
         const std::string getInfo() override {
             return "[Bus]: " + Car::getInfo();
+        }
+
+        ~Bus() {
+            std::cout << ">>> ~Bus(" << getCompany() << ", " << getModel() << ")" << std::endl;
         }
     };
 
@@ -118,10 +141,149 @@ namespace lesson3 {
     public:
         Minivan(std::string company, std::string model)
         : Car(company, model), Bus(company, model), PassengerCar(model, company) {
+            std::cout << ">>> Minivan(" << company << ", " << model << ")" << std::endl;
         }
 
         const std::string getInfo() override {
             return "[Minivan]: " + Car::getInfo();
+        }
+
+        ~Minivan() {
+            std::cout << ">>> ~Minivan()" << getCompany() << ", " << getModel() << ")" << std::endl;
+        }
+    };
+
+    /*
+     * 3. Создать класс: Fraction (дробь). Дробь имеет числитель и знаменатель (например, 3/7 или 9/2).
+     * Предусмотреть, чтобы знаменатель не был равен 0. Перегрузить:
+     * - математические бинарные операторы (+, -, *, /) для выполнения действий с дробями
+     * - унарный оператор (-)
+     * - логические операторы сравнения двух дробей (==, !=, <, >, <=, >=).
+     *
+     * Примечание: Поскольку операторы < и >=, > и <= — это логические противоположности,
+     * попробуйте перегрузить один через другой.
+     *
+     * Продемонстрировать использование перегруженных операторов.
+     */
+
+    class Fraction {
+    private:
+        int numerator;
+        int denominator;
+
+    public:
+        Fraction() {
+            this->numerator = 0;
+            this->denominator = 0;
+        }
+
+        Fraction(int numerator, int denominator) {
+            if (denominator == 0) {
+                std::cout << "Error: denominator can't be 0!" << std::endl;
+                Fraction();
+                return;
+            }
+
+            this->numerator = numerator;
+            this->denominator = denominator;
+        }
+
+        //арифметические операции
+        Fraction operator+(const Fraction &other) const {
+            if (numerator == 0)
+                return Fraction(other.numerator, other.denominator);
+
+            if (other.numerator == 0)
+                return Fraction(numerator, denominator);
+
+            if (denominator == other.denominator)
+                return Fraction(numerator + other.numerator, denominator);
+
+            int newNumerator = other.numerator * denominator + numerator * other.denominator;
+            int newDenominator = denominator * other.denominator;
+
+            return Fraction(newNumerator, newDenominator);
+        }
+        Fraction operator-() const {
+            return Fraction(-numerator, denominator);
+        }
+
+        Fraction operator-(const Fraction &other) const {
+            if (other.numerator == 0)
+                return Fraction(numerator, denominator);
+
+            if (numerator == 0)
+                return Fraction(other.numerator, other.denominator);
+
+            if (denominator == other.denominator)
+                return Fraction(numerator - other.numerator, denominator);
+
+            int newNumerator = other.numerator * denominator - numerator * other.denominator;
+            int newDenominator = denominator * other.denominator;
+
+            return Fraction(newNumerator, newDenominator);
+        }
+
+        Fraction operator*(const Fraction &other) const {
+            if (other.numerator == 0 || numerator == 0)
+                return Fraction();
+
+            return Fraction(numerator * other.numerator, denominator * other.denominator);
+        }
+
+        Fraction operator/(const Fraction &other) const {
+            Fraction swapFraction = Fraction(other.denominator, other.numerator);
+            return *this * swapFraction;
+        }
+
+        //логические операции
+        bool operator==(const Fraction &other) const {
+            if (other.denominator == denominator)
+                return other.numerator == numerator;
+
+            int newDenominator = other.denominator * denominator;
+            Fraction fraction(numerator * other.denominator, newDenominator);
+            Fraction otherFraction(other.numerator * denominator, newDenominator);
+            return fraction.numerator == otherFraction.numerator;
+        }
+
+        bool operator!=(const Fraction &other) const {
+            return !(Fraction(numerator, denominator) == other);
+        }
+
+        bool operator>(const Fraction &other) const {
+            if (other.denominator == denominator)
+                return numerator > other.numerator;
+
+            return numerator * other.denominator > other.numerator * denominator;
+        }
+
+        bool operator<(const Fraction &other) const {
+            if (*this == other)
+                return false;
+
+            return !(*this > other);
+        }
+
+        bool operator>=(const Fraction &other) const {
+            if (*this > other)
+                return true;
+
+            return *this == other;
+        }
+
+        bool operator<=(const Fraction &other) const {
+            if (*this < other)
+                return true;
+
+            return *this == other;
+        }
+
+        const std::string toString() {
+            if (numerator == 0)
+                return "0";
+
+            return std::to_string(numerator) + "/" + std::to_string(denominator);
         }
     };
 
@@ -151,6 +313,92 @@ namespace lesson3 {
         std::cout << minivan.getInfo() << std::endl;
     }
 
+    void fractionTest() {
+        Fraction fraction1(2, 3);
+        Fraction fraction2(4, 5);
+        Fraction fraction3(10, 5);
+        Fraction fraction4(8, 10);
+        Fraction fraction5(4, 5);
+        Fraction zeroFraction;
+
+        // +
+        std::cout << "[+]" << std::endl;
+        std::cout << fraction1.toString() << " + " << fraction2.toString() << " = "
+        << (fraction1 + fraction2).toString() << std::endl;
+        std::cout << fraction3.toString() << " + " << fraction2.toString() << " = "
+        << (fraction3 + fraction2).toString() << std::endl;
+
+        // -
+        std::cout << "[-]" << std::endl;
+        std::cout << fraction1.toString() << " - " << fraction2.toString() << " = "
+        << (fraction1 - fraction2).toString() << std::endl;
+        std::cout << fraction3.toString() << " - " << fraction2.toString() << " = "
+        << (fraction3 - fraction2).toString() << std::endl;
+        std::cout << fraction2.toString() << " - " << fraction3.toString() << " = "
+        << (fraction2 - fraction3).toString() << std::endl;
+        //унарный -
+        std::cout << "-1 * " << fraction2.toString() << " = "
+        << (-fraction2).toString() << std::endl;
+
+        // *
+        std::cout << "[*]" << std::endl;
+        std::cout << fraction1.toString() << " * " << fraction2.toString() << " = "
+        << (fraction1 * fraction2).toString() << std::endl;
+        std::cout << fraction1.toString() << " * " << zeroFraction.toString() << " = "
+        << (fraction1 * zeroFraction).toString() << std::endl;
+
+        // :
+        std::cout << "[:]" << std::endl;
+        std::cout << fraction1.toString() << " : " << fraction2.toString() << " = "
+        << (fraction1 / fraction2).toString() << std::endl;
+
+        // ==
+        std::cout << "[==]" << std::endl;
+        std::cout << fraction1.toString() << " == " << fraction2.toString() << " = "
+        << (fraction1 == fraction2) << std::endl;
+        std::cout << fraction2.toString() << " == " << fraction4.toString() << " = "
+        << (fraction2 == fraction4) << std::endl;
+        std::cout << fraction2.toString() << " == " << fraction5.toString() << " = "
+        << (fraction2 == fraction5) << std::endl;
+
+        // !=
+        std::cout << "[!=]" << std::endl;
+        std::cout << fraction1.toString() << " != " << fraction2.toString() << " = "
+        << (fraction1 != fraction2) << std::endl;
+        std::cout << fraction2.toString() << " != " << fraction4.toString() << " = "
+        << (fraction2 != fraction4) << std::endl;
+        std::cout << fraction2.toString() << " != " << fraction5.toString() << " = "
+        << (fraction2 != fraction5) << std::endl;
+
+        // <
+        std::cout << "[<]" << std::endl;
+        std::cout << fraction1.toString() << " < " << fraction2.toString() << " = "
+        << (fraction1 < fraction2) << std::endl;
+        std::cout << fraction2.toString() << " < " << fraction4.toString() << " = "
+        << (fraction2 < fraction4) << std::endl;
+
+        // >
+        std::cout << "[>]" << std::endl;
+        std::cout << fraction1.toString() << " > " << fraction2.toString() << " = "
+        << (fraction1 > fraction2) << std::endl;
+        std::cout << fraction2.toString() << " > " << fraction4.toString() << " = "
+        << (fraction2 > fraction4) << std::endl;
+
+        // <=
+        std::cout << "[<=]" << std::endl;
+        std::cout << fraction1.toString() << " <= " << fraction2.toString() << " = "
+        << (fraction1 <= fraction2) << std::endl;
+        std::cout << fraction2.toString() << " <= " << fraction4.toString() << " = "
+        << (fraction2 <= fraction4) << std::endl;
+
+        // >=
+        std::cout << "[>=]" << std::endl;
+        std::cout << fraction1.toString() << " >= " << fraction2.toString() << " = "
+        << (fraction1 >= fraction2) << std::endl;
+        std::cout << fraction2.toString() << " >= " << fraction4.toString() << " = "
+        << (fraction2 >= fraction4) << std::endl;
+    }
+
     void run() {
         std::cout << "====================== LESSON 3 ======================" << std::endl;
         std::cout << "Task 1:" << std::endl;
@@ -158,5 +406,8 @@ namespace lesson3 {
 
         std::cout << "Task 2:" << std::endl;
         carTest();
+
+        std::cout << "Task 3:" << std::endl;
+        fractionTest();
     }
 }
