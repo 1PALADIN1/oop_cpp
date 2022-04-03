@@ -1,12 +1,14 @@
 #include "Lesson1/Lesson1.h"
 #include "Lesson2/Lesson2.h"
 #include "Lesson3/Lesson3.h"
+#include "Blackjack/blackjack.h"
 
 int main() {
 
 //    lesson1::run();
 //    lesson2::run();
     lesson3::run();
+    blackjack::run();
 
     return 0;
 }
