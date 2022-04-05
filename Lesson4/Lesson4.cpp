@@ -1,7 +1,42 @@
+#include <vector>
+#include <unordered_map>
 #include <iostream>
 #include "ArrayInt.cpp"
 
 namespace lesson4 {
+
+    /*
+     * 2. Дан вектор чисел, требуется выяснить, сколько среди них различных.
+     * Постараться использовать максимально быстрый алгоритм.
+     */
+    void printVector(std::vector<int> &v) {
+        for (int i : v)
+            std::cout << i << ' ';
+        std::cout << std::endl;
+    }
+
+    void findFreqNumbers(std::vector<int> &v) {
+        std::cout << "Input vector: ";
+        printVector(v);
+
+        std::unordered_map<int, int> m;
+
+        for (int i : v) {
+            if (m.find(i) == m.end()) {
+                //первый раз встречам число
+                std::pair<int, int> new_pair(i, 1);
+                m.insert(new_pair);
+                continue;
+            }
+
+            m[i]++;
+        }
+
+        std::cout << "Result:" << std::endl;
+        for (std::pair<int, int> p: m) {
+            std::cout << p.first << ": " << p.second << std::endl;
+        }
+    }
 
     // ================ Тестирование ================
 
@@ -38,9 +73,17 @@ namespace lesson4 {
         std::cout << "After sort: " << arrayInt.toString() << std::endl;
     }
 
+    void findFreqNumbersTest() {
+        std::vector<int> array { 0, 1, 2, 3, 2, 3, 0, -4, 5, 200, 1, 23, 1, 1, 0, -4, 55 };
+        findFreqNumbers(array);
+    }
+
     void run() {
         std::cout << "====================== LESSON 4 ======================" << std::endl;
         std::cout << "Task 1:" << std::endl;
         arrayIntTest();
+
+        std::cout << "Task 2:" << std::endl;
+        findFreqNumbersTest();
     }
 }
