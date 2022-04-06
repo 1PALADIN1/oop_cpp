@@ -1,0 +1,3 @@
+namespace blackjack {
+    void run();
+}

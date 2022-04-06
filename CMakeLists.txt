@@ -5,4 +5,6 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(OOP_cpp main.cpp
         Lesson1/Lesson1.cpp Lesson1/Lesson1.h
-        Lesson2/Lesson2.cpp Lesson2/Lesson2.h)
+        Lesson2/Lesson2.cpp Lesson2/Lesson2.h
+        Lesson3/Lesson3.cpp Lesson3/Lesson3.h
+        Blackjack/blackjack.cpp Blackjack/blackjack.h)
