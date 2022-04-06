@@ -9,9 +9,9 @@ int main() {
 //    lesson1::run();
 //    lesson2::run();
 //    lesson3::run();
-//    blackjack::run();
 
     lesson4::run();
+    blackjack::run();
 
     return 0;
 }
