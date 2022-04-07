@@ -1,3 +1,4 @@
+#include <vector>
 #include <iostream>
 
 namespace blackjack {
@@ -10,6 +11,9 @@ namespace blackjack {
      * поворачивает лицом вверх, и наоборот.
      * - метод GetValue(), который возвращает значение карты, пока можно считать, что туз = 1.
      */
+
+    const int ACE_MAX_VALUE = 11;
+    const int TOTAL_SCORE = 21;
 
     //масть карты (червы, бубны, трефы, пики)
     enum Suit { Hearts, Diamonds, Clubs, Spades };
@@ -66,7 +70,7 @@ namespace blackjack {
             isFlipped = !isFlipped;
         }
 
-        const int getValue() {
+        const CardValue getValue() {
             return cardValue;
         }
 
@@ -76,9 +80,53 @@ namespace blackjack {
         }
     };
 
+    /* ЗАДАНИЕ К УРОКУ 4 */
+    /*
+     * 3. Реализовать класс Hand, который представляет собой коллекцию карт.
+     * В классе будет одно поле: вектор указателей карт (удобно использовать вектор, т.к. это по сути динамический
+     * массив, а тип его элементов должен быть - указатель на объекты класса Card).
+     * Также в классе Hand должно быть 3 метода:
+     * • метод Add, который добавляет в коллекцию карт новую карту, соответственно он принимает в качестве параметра указатель на новую карту
+     * • метод Clear, который очищает руку от карт
+     * • метод GetValue, который возвращает сумму очков карт руки (здесь предусмотреть возможность того, что туз может быть равен 11).
+     */
+
+    class Hand {
+    private:
+        std::vector<Card*> cards;
+
+    public:
+        void add(Card *card) {
+            cards.push_back(card);
+        }
+
+        void clear() {
+            cards.clear();
+        }
+
+        const int getValue() {
+            int sum = 0;
+            for (Card* card : cards) {
+                sum += card->getValue() == CardValue::Ace ? ACE_MAX_VALUE : card->getValue();
+            }
+
+            if (sum > TOTAL_SCORE) {
+                //пробуем пересчитать, где тузы = 1
+                sum = 0;
+                for (Card* card : cards) {
+                    sum += card->getValue();
+                }
+            }
+
+            return sum;
+        }
+    };
+
     // ================ Тестирование ================
 
     void cardTest() {
+        std::cout << "LESSON 3 TEST:" << std::endl;
+
         Card cardAce(Suit::Spades, CardValue::Ace);
         std::cout << cardAce.toString() << std::endl;
 
@@ -91,8 +139,34 @@ namespace blackjack {
         std::cout << cardQueen.toString() << std::endl;
     }
 
+    void handTest() {
+        std::cout << "LESSON 4 TEST:" << std::endl;
+
+        Hand hand;
+
+        Card* cardAce = new Card(Suit::Spades, CardValue::Ace);
+        Card* cardQueen = new Card(Suit::Diamonds, CardValue::Queen);
+        Card* cardTen = new Card(Suit::Clubs, CardValue::Ten);
+
+        hand.add(cardAce);
+        hand.add(cardQueen);
+        hand.add(cardTen);
+        std::cout << "Cards total sum = " << hand.getValue() << std::endl;
+        hand.clear();
+
+        hand.add(cardAce);
+        hand.add(cardQueen);
+        std::cout << "Cards total sum = " << hand.getValue() << std::endl;
+        hand.clear();
+
+        delete cardAce;
+        delete cardTen;
+        delete cardQueen;
+    }
+
     void run() {
         std::cout << "Blackjack test:" << std::endl;
         cardTest();
+        handTest();
     }
 }
