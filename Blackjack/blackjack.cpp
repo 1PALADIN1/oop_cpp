@@ -70,7 +70,7 @@ namespace blackjack {
             isFlipped = !isFlipped;
         }
 
-        const CardValue getValue() {
+        CardValue getValue() const {
             return cardValue;
         }
 
@@ -101,10 +101,16 @@ namespace blackjack {
         }
 
         void clear() {
+            std::vector<Card*>::iterator iter = cards.begin();
+            for (iter = cards.begin(); iter != cards.end(); ++iter) {
+                delete *iter;
+                *iter = 0;
+            }
+
             cards.clear();
         }
 
-        const int getValue() {
+        int getValue() const {
             int sum = 0;
             for (Card* card : cards) {
                 sum += card->getValue() == CardValue::Ace ? ACE_MAX_VALUE : card->getValue();
