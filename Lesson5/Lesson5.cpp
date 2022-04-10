@@ -83,6 +83,34 @@ namespace lesson5 {
         }
     };
 
+    /*
+     * 3. Написать шаблон класса StringValuePair, в котором первое значение всегда типа string, а второе — любого типа.
+     * Этот шаблон класса должен наследовать частично специализированный класс Pair, в котором первый параметр — string,
+     * а второй — любого типа данных.
+     * Следующий код:
+
+        int main()
+        {
+            StringValuePair<int> svp("Amazing", 7);
+            std::cout << "Pair: " << svp.first() << ' ' << svp.second() << '\n';
+            return 0;
+        }
+
+        … должен производить следующий результат:
+        Pair: Amazing 7
+
+        Подсказка: при вызове конструктора класса **Pair* из конструктора класса StringValuePair не забудьте указать,
+        что параметры относятся к классу Pair. *
+     */
+
+    template<class V>
+    class StringValuePair : public Pair<std::string, V> {
+    public:
+        StringValuePair(std::string first, V second)
+        : Pair<std::string, V>(first, second) {
+        }
+    };
+
 
     // ================ Тестирование ================
 
@@ -102,6 +130,11 @@ namespace lesson5 {
         std::cout << "Pair: " << p2.first() << ' ' << p2.second() << '\n';
     }
 
+    void stringPairTest() {
+        StringValuePair<int> svp("Amazing", 7);
+        std::cout << "Pair: " << svp.first() << ' ' << svp.second() << '\n';
+    }
+
     void run() {
         std::cout << "====================== LESSON 5 ======================" << std::endl;
         std::cout << "Task 1:" << std::endl;
@@ -111,5 +144,10 @@ namespace lesson5 {
 
         std::cout << "Task 2:" << std::endl;
         pairTest();
+
+        std::cout << std::endl;
+
+        std::cout << "Task 3:" << std::endl;
+        stringPairTest();
     }
 }
