@@ -10,4 +10,5 @@ add_executable(OOP_cpp main.cpp
         Blackjack/blackjack.cpp Blackjack/blackjack.h
         Lesson4/Lesson4.cpp Lesson4/Lesson4.h
         Lesson4/ArrayInt.cpp
-        Lesson5/Lesson5.cpp Lesson5/Lesson5.h)
+        Lesson5/Lesson5.cpp Lesson5/Lesson5.h
+        Lesson6/Lesson6.cpp Lesson6/Lesson6.h)
