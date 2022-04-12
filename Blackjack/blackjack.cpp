@@ -110,7 +110,7 @@ namespace blackjack {
             cards.clear();
         }
 
-        int getValue() const {
+        int getTotal() const {
             int sum = 0;
             for (Card* card : cards) {
                 sum += card->getValue() == CardValue::Ace ? ACE_MAX_VALUE : card->getValue();
@@ -125,6 +125,39 @@ namespace blackjack {
             }
 
             return sum;
+        }
+    };
+
+    /* ЗАДАНИЕ К УРОКУ 5 */
+    /*
+     * 4. Согласно иерархии классов, которая представлена в методичке к уроку 3, от класса Hand наследует
+     * класс GenericPlayer, который обобщенно представляет игрока, ведь у нас будет два типа игроков - человек и компьютер.
+     * Создать класс GenericPlayer, в который добавить поле name - имя игрока. Также добавить 3 метода:
+     * • IsHitting() - чисто виртуальная функция, возвращает информацию, нужна ли игроку еще одна карта.
+     * • IsBoosted() - возвращает bool значение, есть ли у игрока перебор
+     * • Bust() - выводит на экран имя игрока и объявляет, что у него перебор.
+     */
+
+    class GenericPlayer : public Hand {
+    private:
+        std::string name;
+
+    public:
+        GenericPlayer(std::string name)
+        : name(name) {
+        }
+
+        virtual bool isHitting()=0;
+
+        bool isBoosted() {
+            return getTotal() > TOTAL_SCORE;
+        }
+
+        void bust() {
+            if (!isBoosted())
+                return;
+
+            std::cout << name << " is boosted!" << std::endl;
         }
     };
 
@@ -157,12 +190,12 @@ namespace blackjack {
         hand.add(cardAce);
         hand.add(cardQueen);
         hand.add(cardTen);
-        std::cout << "Cards total sum = " << hand.getValue() << std::endl;
+        std::cout << "Cards total sum = " << hand.getTotal() << std::endl;
         hand.clear();
 
         hand.add(cardAce);
         hand.add(cardQueen);
-        std::cout << "Cards total sum = " << hand.getValue() << std::endl;
+        std::cout << "Cards total sum = " << hand.getTotal() << std::endl;
         hand.clear();
 
         delete cardAce;
@@ -171,7 +204,7 @@ namespace blackjack {
     }
 
     void run() {
-        std::cout << "Blackjack test:" << std::endl;
+        std::cout << "====================== Blackjack test ======================" << std::endl;
         cardTest();
         handTest();
     }
