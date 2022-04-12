@@ -139,25 +139,60 @@ namespace blackjack {
      */
 
     class GenericPlayer : public Hand {
-    private:
-        std::string name;
+    protected:
+        std::string m_Name;
 
     public:
-        GenericPlayer(std::string name)
-        : name(name) {
+        GenericPlayer(const std::string& name)
+        : m_Name(name) {
         }
 
-        virtual bool isHitting()=0;
+        virtual bool isHitting() const = 0;
 
-        bool isBoosted() {
+        bool isBoosted() const {
             return getTotal() > TOTAL_SCORE;
         }
 
-        void bust() {
+        void bust() const {
             if (!isBoosted())
                 return;
 
-            std::cout << name << " is boosted!" << std::endl;
+            std::cout << m_Name << " is boosted!" << std::endl;
+        }
+    };
+
+    /* ЗАДАНИЕ К УРОКУ 6 */
+    /*
+     * 3. Реализовать класс Player, который наследует от класса GenericPlayer. У этого класса будет 4 метода:
+     * • virtual bool IsHitting() const - реализация чисто виртуальной функции базового класса.
+     * Метод спрашивает у пользователя, нужна ли ему еще одна карта и возвращает ответ пользователя в виде true или false.
+     * • void Win() const- выводит на экран имя игрока и сообщение, что он выиграл.
+     * • void Lose() const - выводит на экран имя игрока и сообщение, что он проиграл.
+     * • void Push() const - выводит на экран имя игрока и сообщение, что он сыграл вничью.
+     */
+
+    class Player : public GenericPlayer {
+    public:
+        Player(const std::string& name) : GenericPlayer(name) {
+        }
+
+        virtual bool isHitting() const {
+            std::cout << m_Name << ", do you want a hit? (Y/N): " << std::endl;
+            char response;
+            std::cin >> response;
+            return (response == 'y' || response == 'Y');
+        }
+
+        void win() const {
+            std::cout << m_Name << " wins!" << std::endl;
+        }
+
+        void lose() const {
+            std::cout << m_Name << " loses..." << std::endl;
+        }
+
+        void push() const {
+            std::cout << m_Name << " pushes." << std::endl;
         }
     };
 
