@@ -92,7 +92,7 @@ namespace blackjack {
      */
 
     class Hand {
-    private:
+    protected:
         std::vector<Card*> cards;
 
     public:
@@ -193,6 +193,33 @@ namespace blackjack {
 
         void push() const {
             std::cout << m_Name << " pushes." << std::endl;
+        }
+    };
+
+    /*
+     * 4. Реализовать класс House, который представляет дилера. Этот класс наследует от класса GenericPlayer.
+     * У него есть 2 метода:
+     * • virtual bool IsHitting() const - метод указывает, нужна ли дилеру еще одна карта.
+     * Если у дилера не больше 16 очков, то он берет еще одну карту.
+     * • void FlipFirstCard() - метод переворачивает первую карту дилера.
+     */
+
+    class House : public GenericPlayer {
+    public:
+        House() : GenericPlayer("House") {
+        }
+
+        virtual bool isHitting() const {
+            return getTotal() <= 16;
+        }
+
+        void flipFirstCard() {
+            if (!cards.empty()) {
+                cards[0]->flip();
+                return;
+            }
+
+            std::cout << "No cards to flip!" << std::endl;
         }
     };
 
