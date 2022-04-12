@@ -14,7 +14,7 @@ int main() {
 //    lesson4::run();
 //    lesson5::run();
 
-//    lesson6::run();
+    lesson6::run();
     blackjack::run();
 
     return 0;

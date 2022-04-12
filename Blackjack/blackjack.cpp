@@ -32,22 +32,24 @@ namespace blackjack {
         Ten = 10,
 
         //валет, дама, король
-        Jack = 10,
-        Queen = 10,
-        King = 10,
+        Jack = 11,
+        Queen = 12,
+        King = 13,
 
         //туз
         Ace = 1
     };
 
     class Card {
+        friend std::ostream& operator<<(std::ostream& os, const Card& card);
+
     private:
         Suit suit;
         CardValue cardValue;
         bool isFlipped;
 
-        std::string suitToString(Suit suit) {
-            switch(suit)
+        std::string suitToString(Suit inp_suit) const {
+            switch(inp_suit)
             {
                 case Spades:   return "Spades";
                 case Hearts:   return "Hearts";
@@ -55,6 +57,26 @@ namespace blackjack {
                 case Clubs:    return "Clubs";
                 default:       return "";
             };
+        }
+
+        std::string cardValueToString(CardValue inp_cardValue) const {
+            switch (inp_cardValue) {
+                case Two:       return "2";
+                case Three:     return "3";
+                case Four:      return "4";
+                case Five:      return "5";
+                case Six:       return "6";
+                case Seven:     return "7";
+                case Eight:     return "8";
+                case Nine:      return "9";
+                case Ten:       return "10";
+                case Jack:      return "J";
+                case Queen:     return "Q";
+                case King:      return "K";
+                case Ace:       return "A";
+
+                default:        return "";
+            }
         }
 
     public:
@@ -70,7 +92,10 @@ namespace blackjack {
             isFlipped = !isFlipped;
         }
 
-        CardValue getValue() const {
+        int getValue() const {
+            if (cardValue > 10)
+                return 10;
+
             return cardValue;
         }
 
@@ -139,6 +164,8 @@ namespace blackjack {
      */
 
     class GenericPlayer : public Hand {
+        friend std::ostream& operator<<(std::ostream& os, const GenericPlayer& genericPlayer);
+
     protected:
         std::string m_Name;
 
@@ -223,6 +250,46 @@ namespace blackjack {
         }
     };
 
+    /*
+     * 5. Написать перегрузку оператора вывода для класса Card. Если карта перевернута рубашкой вверх
+     * (мы ее не видим), вывести ХХ, если мы ее видим, вывести масть и номинал карты.
+     * Также для класса GenericPlayer написать перегрузку оператора вывода, который должен
+     * отображать имя игрока и его карты, а также общую сумму очков его карт.
+     */
+
+    std::ostream& operator<<(std::ostream& os, const Card& card)
+    {
+        if (card.isFlipped) {
+            os << card.cardValueToString(card.cardValue) << " " << card.suitToString(card.suit);
+        } else {
+            os << "XX";
+        }
+
+        return os;
+    }
+
+    std::ostream& operator<<(std::ostream& os, const GenericPlayer& genericPlayer) {
+        os << genericPlayer.m_Name << ":\t";
+
+        if (genericPlayer.cards.empty()) {
+            os << "[ empty ]";
+        } else {
+            //выводим карты
+            std::vector<Card*>::const_iterator pCard;
+            for (pCard = genericPlayer.cards.begin(); pCard != genericPlayer.cards.end(); ++pCard) {
+                os << *(*pCard) << "\t";
+            }
+
+            //выводим количество очков
+            int total = genericPlayer.getTotal();
+            if (total > 0) {
+                os << "(" << total << ")";
+            }
+        }
+
+        return os;
+    }
+
     // ================ Тестирование ================
 
     void cardTest() {
@@ -265,9 +332,39 @@ namespace blackjack {
         delete cardQueen;
     }
 
+    void genericPlayerCoutTest() {
+        Player* player = new Player("Player");
+
+        std::cout << *player << std::endl;
+
+        Card* cardAce = new Card(Suit::Spades, CardValue::Ace);
+        Card* cardQueen = new Card(Suit::Diamonds, CardValue::Queen);
+        Card* cardTen = new Card(Suit::Clubs, CardValue::Ten);
+
+        player->add(cardAce);
+        player->add(cardQueen);
+        player->add(cardTen);
+
+        cardQueen->flip();
+
+        std::cout << *player << std::endl;
+
+        cardAce->flip();
+
+        std::cout << *player << std::endl;
+
+        player->clear();
+
+        delete cardAce;
+        delete cardTen;
+        delete cardQueen;
+        delete player;
+    }
+
     void run() {
         std::cout << "====================== Blackjack test ======================" << std::endl;
-        cardTest();
-        handTest();
+//        cardTest();
+//        handTest();
+        genericPlayerCoutTest();
     }
 }
