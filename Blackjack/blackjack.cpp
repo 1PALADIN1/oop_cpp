@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 namespace blackjack {
 
@@ -14,12 +15,16 @@ namespace blackjack {
 
     const int ACE_MAX_VALUE = 11;
     const int TOTAL_SCORE = 21;
+    const int TOTAL_CARDS = 52;
 
     //масть карты (червы, бубны, трефы, пики)
     enum Suit { Hearts, Diamonds, Clubs, Spades };
 
     //значение карты
     enum CardValue : int {
+        //туз
+        Ace = 1,
+
         //2-10
         Two = 2,
         Three = 3,
@@ -34,10 +39,7 @@ namespace blackjack {
         //валет, дама, король
         Jack = 11,
         Queen = 12,
-        King = 13,
-
-        //туз
-        Ace = 1
+        King = 13
     };
 
     class Card {
@@ -176,7 +178,7 @@ namespace blackjack {
 
         virtual bool isHitting() const = 0;
 
-        bool isBoosted() const {
+        bool isBusted() const {
             return getTotal() > TOTAL_SCORE;
         }
 
@@ -290,6 +292,61 @@ namespace blackjack {
         return os;
     }
 
+    /* ЗАДАНИЕ К УРОКУ 7 */
+    /*
+     * 3. Создать класс Deck, который наследует от класса Hand и представляет собой колоду карт.
+     * Класс Deck имеет 4 метода:
+     * • vold Populate() - Создает стандартную колоду из 52 карт, вызывается из конструктора.
+     * • void Shuffle() - Метод, который тасует карты, можно использовать функцию из алгоритмов STL random_shuffle
+     * • vold Deal (Hand& aHand) - метод, который раздает в руку одну карту
+     * • void AddltionalCards (GenericPlayer& aGenerlcPlayer) - раздает игроку дополнительные карты до тех пор,
+     * пока он может и хочет их получать
+     * Обратите внимание на применение полиморфизма. В каких методах применяется этот принцип ООП?
+     */
+
+    class Deck : public Hand {
+    public:
+        Deck() {
+            cards.reserve(TOTAL_CARDS);
+            populate();
+        }
+
+        void populate() {
+            clear();
+
+            for (int cardVal = CardValue::Ace; cardVal <= CardValue::King; ++cardVal) {
+                for (int suit = Suit::Hearts; suit <= Suit::Spades; ++suit) {
+                    Card* card = new Card(static_cast<Suit>(suit),static_cast<CardValue>(cardVal));
+                    add(card);
+                }
+            }
+        }
+
+        void shuffle() {
+            std::random_shuffle(cards.begin(), cards.end());
+        }
+
+        void deal(Hand& hand) {
+            if (cards.empty()) {
+                std::cerr << "No more cards!" << std::endl;
+                return;
+            }
+
+            hand.add(cards.back());
+            cards.pop_back();
+        }
+
+        void additionalCards(GenericPlayer& genericPlayer) {
+            while (!(genericPlayer.isBusted()) && genericPlayer.isHitting()) {
+                deal(genericPlayer);
+                std::cout << genericPlayer << std::endl;
+
+                if (genericPlayer.isBusted())
+                    genericPlayer.bust();
+            }
+        }
+    };
+
     // ================ Тестирование ================
 
     void cardTest() {
@@ -365,6 +422,11 @@ namespace blackjack {
         std::cout << "====================== Blackjack test ======================" << std::endl;
 //        cardTest();
 //        handTest();
-        genericPlayerCoutTest();
+//        genericPlayerCoutTest();
+
+        Deck deck;
+        deck.shuffle();
+
+
     }
 }
