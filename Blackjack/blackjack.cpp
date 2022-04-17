@@ -101,9 +101,8 @@ namespace blackjack {
             return cardValue;
         }
 
-        std::string toString() {
-            return "SUIT: " + suitToString(suit) + ", VALUE: " + std::to_string(cardValue)
-            + ", is flipped: " + std::to_string(isFlipped);
+        bool isOpened() const {
+            return isFlipped;
         }
     };
 
@@ -135,6 +134,13 @@ namespace blackjack {
             }
 
             cards.clear();
+        }
+
+        void showAllCards() {
+            for (Card* card : cards) {
+                if (!card->isOpened())
+                    card->flip();
+            }
         }
 
         int getTotal() const {
@@ -432,6 +438,18 @@ namespace blackjack {
                 }
             }
 
+            std::cout << "========================" << std::endl << "Player cards:" << std::endl;
+
+            //показываем карты всех игроков
+            for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                pIter->showAllCards();
+                std::cout << *pIter << std::endl;
+            }
+
+            //и дилера
+            house.showAllCards();
+            std::cout << house << std::endl;
+
             // очищает руки всех игроков
             for (pIter = players.begin(); pIter != players.end(); ++pIter) {
                 pIter->clear();
@@ -443,11 +461,27 @@ namespace blackjack {
 
     // ================ Тестирование ================
 
+    /* ЗАДАНИЕ К УРОКУ 7 */
+    /*
+     * 5. Написать функцию main() к игре Блекджек. В этой функции вводятся имена игроков.
+     * Создается объект класса Game и запускается игровой процесс. Предусмотреть возможность повторной игры.
+     */
+
     void run() {
         std::cout << "====================== WELCOME TO BLACKJACK ======================" << std::endl;
 
         Game* game = new Game({ "Victor", "Ivan", "Johnny" });
-        game->play();
+
+        bool isGameRunning = true;
+        while (isGameRunning) {
+            game->play();
+
+            char response;
+            std::cout << "Another round (Y/N)?" << std::endl;
+            std::cin >> response;
+            isGameRunning = (response == 'y' || response == 'Y');
+        }
+
         delete game;
     }
 }
