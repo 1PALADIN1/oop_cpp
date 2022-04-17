@@ -106,5 +106,7 @@ namespace lesson7 {
 
         std::cout << "Task 2:" << std::endl;
         dateTest2();
+
+        std::cout << std::endl;
     }
 }
