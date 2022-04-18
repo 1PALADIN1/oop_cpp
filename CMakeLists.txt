@@ -12,4 +12,5 @@ add_executable(OOP_cpp main.cpp
         Lesson4/ArrayInt.cpp
         Lesson5/Lesson5.cpp Lesson5/Lesson5.h
         Lesson6/Lesson6.cpp Lesson6/Lesson6.h
-        Lesson7/Lesson7.cpp Lesson7/Lesson7.h)
+        Lesson7/Lesson7.cpp Lesson7/Lesson7.h
+        Lesson8/Lesson8.cpp Lesson8/Lesson8.h)

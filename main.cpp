@@ -6,6 +6,7 @@
 #include "Lesson5/Lesson5.h"
 #include "Lesson6/Lesson6.h"
 #include "Lesson7/Lesson7.h"
+#include "Lesson8/Lesson8.h"
 
 int main() {
 
@@ -15,9 +16,10 @@ int main() {
 //    lesson4::run();
 //    lesson5::run();
 //    lesson6::run();
+//    lesson7::run();
+//    blackjack::run();
 
-    lesson7::run();
-    blackjack::run();
+    lesson8::run();
 
     return 0;
 }
