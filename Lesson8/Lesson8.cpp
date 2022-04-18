@@ -72,6 +72,65 @@ namespace lesson8 {
         }
     };
 
+    /*
+     * 3. Написать класс «робот», моделирующий перемещения робота по сетке 10x10, у которого есть метод,
+     * означающий задание переместиться на соседнюю позицию. Эти методы должны запускать классы-исключения OffTheField,
+     * если робот должен уйти с сетки, и IllegalCommand, если подана неверная команда (направление не находится
+     * в нужном диапазоне). Объект исключения должен содержать всю необходимую информацию — текущую позицию и
+     * направление движения. Написать функцию main, пользующуюся этим классом и перехватывающую все исключения от
+     * его методов, а также выводящую подробную информацию о всех возникающих ошибках.
+     */
+
+    const int GRID_SIZE = 10;
+
+    class OffTheField : public std::logic_error {
+    public:
+        OffTheField(const int startX, const int startY, const int targetX, const int targetY)
+        : std::logic_error("Can't move from (" + std::to_string(startX) + ", " + std::to_string(startY) + ") to ("
+        + std::to_string(targetX) + ", " + std::to_string(targetY) + "). Point is out of field!") {
+        }
+    };
+
+    class IllegalCommand : public std::logic_error {
+    public:
+        IllegalCommand(const int dirX, const int dirY)
+        : std::logic_error("Input direction is not correct (" + std::to_string(dirX) + ", "
+        + std::to_string(dirY) + ")!") {
+        }
+    };
+
+    class Robot {
+    private:
+        int posX;
+        int posY;
+
+    public:
+        Robot() {
+            posX = 0;
+            posY = 0;
+        }
+
+        void move(const int dirX, const int dirY) {
+            if (dirX == 0 && dirY == 0) {
+                throw IllegalCommand(dirX, dirY);
+            }
+
+            if (!(abs(dirX) <= 1 && abs(dirY) <= 1)) {
+                throw IllegalCommand(dirX, dirY);
+            }
+
+            int targetX = posX + dirX;
+            int targetY = posY + dirY;
+            if (targetX >= GRID_SIZE || targetX < 0 || targetY >= GRID_SIZE || targetY < 0) {
+                throw OffTheField(posX, posY, targetX, targetY);
+            }
+
+            posX += dirX;
+            posY += dirY;
+            std::cout << "Robot moved to new position (" << posX << ", " << posY << ")" << std::endl;
+        }
+    };
+
     // ================ Тестирование ================
 
     void divTest() {
@@ -114,6 +173,48 @@ namespace lesson8 {
         }
     }
 
+    void robotTest(Robot& robot, const int dirX, const int dirY) {
+        try {
+            robot.move(dirX, dirY);
+        } catch (const IllegalCommand& e) {
+            std::cout << ">>> " << e.what() << std::endl;
+        } catch (const OffTheField& e) {
+            std::cout << ">>> " << e.what() << std::endl;
+        }
+    }
+
+    void robotTest() {
+        Robot robot;
+
+        //not correct command test
+        robotTest(robot, 0, 0);
+        robotTest(robot, 0, 2);
+        robotTest(robot, 2, 2);
+        robotTest(robot, -20, -2);
+
+        //out of field test
+        robotTest(robot, 0, -1);
+        robotTest(robot, -1, 0);
+        robotTest(robot, -1, -1);
+
+        //correct input
+        for (int i = 0; i < GRID_SIZE - 1; ++i) {
+            robotTest(robot, 0, 1);
+        }
+
+        //out of field test
+        robotTest(robot, 0, 1);
+
+        //correct input
+        for (int i = 0; i < GRID_SIZE - 1; ++i) {
+            robotTest(robot, 1, 0);
+        }
+
+        //out of field test
+        robotTest(robot, 1, 0);
+        robotTest(robot, 1, 1);
+    }
+
     void run() {
         std::cout << "====================== LESSON 8 ======================" << std::endl;
         std::cout << "Task 1:" << std::endl;
@@ -123,5 +224,10 @@ namespace lesson8 {
 
         std::cout << "Task 2:" << std::endl;
         barTest();
+
+        std::cout << std::endl;
+
+        std::cout << "Task 3:" << std::endl;
+        robotTest();
     }
 }
