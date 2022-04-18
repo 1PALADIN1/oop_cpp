@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 namespace blackjack {
 
@@ -14,12 +15,16 @@ namespace blackjack {
 
     const int ACE_MAX_VALUE = 11;
     const int TOTAL_SCORE = 21;
+    const int TOTAL_CARDS = 52;
 
     //масть карты (червы, бубны, трефы, пики)
     enum Suit { Hearts, Diamonds, Clubs, Spades };
 
     //значение карты
     enum CardValue : int {
+        //туз
+        Ace = 1,
+
         //2-10
         Two = 2,
         Three = 3,
@@ -34,10 +39,7 @@ namespace blackjack {
         //валет, дама, король
         Jack = 11,
         Queen = 12,
-        King = 13,
-
-        //туз
-        Ace = 1
+        King = 13
     };
 
     class Card {
@@ -99,9 +101,8 @@ namespace blackjack {
             return cardValue;
         }
 
-        std::string toString() {
-            return "SUIT: " + suitToString(suit) + ", VALUE: " + std::to_string(cardValue)
-            + ", is flipped: " + std::to_string(isFlipped);
+        bool isOpened() const {
+            return isFlipped;
         }
     };
 
@@ -133,6 +134,13 @@ namespace blackjack {
             }
 
             cards.clear();
+        }
+
+        void showAllCards() {
+            for (Card* card : cards) {
+                if (!card->isOpened())
+                    card->flip();
+            }
         }
 
         int getTotal() const {
@@ -176,15 +184,15 @@ namespace blackjack {
 
         virtual bool isHitting() const = 0;
 
-        bool isBoosted() const {
+        bool isBusted() const {
             return getTotal() > TOTAL_SCORE;
         }
 
         void bust() const {
-            if (!isBoosted())
+            if (!isBusted())
                 return;
 
-            std::cout << m_Name << " is boosted!" << std::endl;
+            std::cout << m_Name << " is busted!" << std::endl;
         }
     };
 
@@ -290,81 +298,190 @@ namespace blackjack {
         return os;
     }
 
+    /* ЗАДАНИЕ К УРОКУ 7 */
+    /*
+     * 3. Создать класс Deck, который наследует от класса Hand и представляет собой колоду карт.
+     * Класс Deck имеет 4 метода:
+     * • vold Populate() - Создает стандартную колоду из 52 карт, вызывается из конструктора.
+     * • void Shuffle() - Метод, который тасует карты, можно использовать функцию из алгоритмов STL random_shuffle
+     * • vold Deal (Hand& aHand) - метод, который раздает в руку одну карту
+     * • void AddltionalCards (GenericPlayer& aGenerlcPlayer) - раздает игроку дополнительные карты до тех пор,
+     * пока он может и хочет их получать
+     * Обратите внимание на применение полиморфизма. В каких методах применяется этот принцип ООП?
+     */
+
+    class Deck : public Hand {
+    public:
+        Deck() {
+            cards.reserve(TOTAL_CARDS);
+            populate();
+        }
+
+        void populate() {
+            clear();
+
+            for (int cardVal = CardValue::Ace; cardVal <= CardValue::King; ++cardVal) {
+                for (int suit = Suit::Hearts; suit <= Suit::Spades; ++suit) {
+                    Card* card = new Card(static_cast<Suit>(suit),static_cast<CardValue>(cardVal));
+                    add(card);
+                }
+            }
+        }
+
+        void shuffle() {
+            std::random_shuffle(cards.begin(), cards.end());
+        }
+
+        void deal(Hand& hand) {
+            if (cards.empty()) {
+                std::cerr << "No more cards!" << std::endl;
+                return;
+            }
+
+            hand.add(cards.back());
+            cards.pop_back();
+        }
+
+        void additionalCards(GenericPlayer& genericPlayer) {
+            while (!(genericPlayer.isBusted()) && genericPlayer.isHitting()) {
+                deal(genericPlayer);
+                std::cout << genericPlayer << std::endl;
+
+                if (genericPlayer.isBusted())
+                    genericPlayer.bust();
+            }
+        }
+    };
+
+    /*
+     * 4. Реализовать класс Game, который представляет собой основной процесс игры. У этого класса будет 3 поля:
+     * • колода карт
+     * • рука дилера
+     * • вектор игроков.
+     * Конструктор класса принимает в качестве параметра вектор имен игроков и создает объекты самих игроков.
+     * В конструкторе создается колода карт и затем перемешивается.
+     * Также класс имеет один метод play(). В этом методе раздаются каждому игроку по две стартовые карты,
+     * а первая карта дилера прячется. Далее выводится на экран информация о картах каждого игра,
+     * в т.ч. и для дилера. Затем раздаются игрокам дополнительные карты. Потом показывается первая карта дилера
+     * и дилер набирает карты, если ему надо. После этого выводится сообщение, кто победил, а кто проиграл.
+     * В конце руки всех игроков очищаются.
+     */
+
+    class Game {
+    private:
+        Deck deck;
+        House house;
+        std::vector<Player> players;
+
+    public:
+        Game(const std::vector<std::string>& names) {
+            std::vector<std::string>::const_iterator playerName;
+            for (playerName = names.begin(); playerName != names.end() ; ++playerName) {
+                players.push_back(Player(*playerName));
+            }
+
+            srand(static_cast<unsigned int>(time(0)));
+            deck.populate();
+            deck.shuffle();
+        }
+
+        void play() {
+            // раздает каждому по две стартовые карты
+            std::vector<Player>::iterator pIter;
+            for (int i = 0; i < 2; ++i) {
+                for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                    deck.deal(*pIter);
+                }
+
+                deck.deal(house);
+            }
+
+            // карта дилера по умолчанию скрыта
+
+            // открывает руки всех игроков
+            for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                std::cout << *pIter << std::endl;
+            }
+            std::cout << house << std::endl;
+
+            // раздает игрокам дополнительные карты
+            for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                deck.additionalCards(*pIter);
+            }
+
+            // показывает первую карту дилера
+            house.flipFirstCard();
+            std::cout << house << std::endl;
+
+            // раздает дилеру дополнительные карты
+            deck.additionalCards(house);
+
+            if (house.isBusted()) {
+                // все, кто остался в игре, побеждают
+                for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                    if (!(pIter->isBusted())) {
+                        pIter->win();
+                    }
+                }
+            } else {
+                // сравнивает суммы очков всех оставшихся игроков с суммой очков дилера
+                for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                    if (!(pIter->isBusted())) {
+                        if (pIter->getTotal() > house.getTotal()) {
+                            pIter->win();
+                        } else if (pIter->getTotal() < house.getTotal()) {
+                            pIter->lose();
+                        } else {
+                            pIter->push();
+                        }
+                    }
+                }
+            }
+
+            std::cout << "========================" << std::endl << "Player cards:" << std::endl;
+
+            //показываем карты всех игроков
+            for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                pIter->showAllCards();
+                std::cout << *pIter << std::endl;
+            }
+
+            //и дилера
+            house.showAllCards();
+            std::cout << house << std::endl;
+
+            // очищает руки всех игроков
+            for (pIter = players.begin(); pIter != players.end(); ++pIter) {
+                pIter->clear();
+            }
+            house.clear();
+        }
+    };
+
+
     // ================ Тестирование ================
 
-    void cardTest() {
-        std::cout << "LESSON 3 TEST:" << std::endl;
-
-        Card cardAce(Suit::Spades, CardValue::Ace);
-        std::cout << cardAce.toString() << std::endl;
-
-        cardAce.flip();
-        std::cout << cardAce.toString() << std::endl;
-
-        Card cardQueen(Suit::Diamonds, CardValue::Queen, true);
-        std::cout << cardQueen.toString() << std::endl;
-        cardQueen.flip();
-        std::cout << cardQueen.toString() << std::endl;
-    }
-
-    void handTest() {
-        std::cout << "LESSON 4 TEST:" << std::endl;
-
-        Hand hand;
-
-        Card* cardAce = new Card(Suit::Spades, CardValue::Ace);
-        Card* cardQueen = new Card(Suit::Diamonds, CardValue::Queen);
-        Card* cardTen = new Card(Suit::Clubs, CardValue::Ten);
-
-        hand.add(cardAce);
-        hand.add(cardQueen);
-        hand.add(cardTen);
-        std::cout << "Cards total sum = " << hand.getTotal() << std::endl;
-        hand.clear();
-
-        hand.add(cardAce);
-        hand.add(cardQueen);
-        std::cout << "Cards total sum = " << hand.getTotal() << std::endl;
-        hand.clear();
-
-        delete cardAce;
-        delete cardTen;
-        delete cardQueen;
-    }
-
-    void genericPlayerCoutTest() {
-        Player* player = new Player("Player");
-
-        std::cout << *player << std::endl;
-
-        Card* cardAce = new Card(Suit::Spades, CardValue::Ace);
-        Card* cardQueen = new Card(Suit::Diamonds, CardValue::Queen);
-        Card* cardTen = new Card(Suit::Clubs, CardValue::Ten);
-
-        player->add(cardAce);
-        player->add(cardQueen);
-        player->add(cardTen);
-
-        cardQueen->flip();
-
-        std::cout << *player << std::endl;
-
-        cardAce->flip();
-
-        std::cout << *player << std::endl;
-
-        player->clear();
-
-        delete cardAce;
-        delete cardTen;
-        delete cardQueen;
-        delete player;
-    }
+    /* ЗАДАНИЕ К УРОКУ 7 */
+    /*
+     * 5. Написать функцию main() к игре Блекджек. В этой функции вводятся имена игроков.
+     * Создается объект класса Game и запускается игровой процесс. Предусмотреть возможность повторной игры.
+     */
 
     void run() {
-        std::cout << "====================== Blackjack test ======================" << std::endl;
-//        cardTest();
-//        handTest();
-        genericPlayerCoutTest();
+        std::cout << "====================== WELCOME TO BLACKJACK ======================" << std::endl;
+
+        Game* game = new Game({ "Victor", "Ivan", "Johnny" });
+
+        bool isGameRunning = true;
+        while (isGameRunning) {
+            game->play();
+
+            char response;
+            std::cout << "Another round (Y/N)?" << std::endl;
+            std::cin >> response;
+            isGameRunning = (response == 'y' || response == 'Y');
+        }
+
+        delete game;
     }
 }
